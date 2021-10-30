@@ -1,4 +1,4 @@
-import os
+import os, random
 import tkinter as tk
 from PIL import Image, ImageTk
 
@@ -30,10 +30,12 @@ class SlideShow(tk.Tk):
         Get image directory from command line or use current directory
         """
         for root, _, files in os.walk(directory):
-            for f in files:
-                if f.endswith(".png") or f.endswith(".jpg"):
-                    img_path = os.path.join(root, f)
+            for file in files:
+                if file.endswith(".png") or file.endswith(".jpg"):
+                    img_path = os.path.join(root, file)
                     self.image_list.append(img_path)
+
+        random.shuffle(self.image_list)
 
     def start_slideshow(self, delay=4):
         """
