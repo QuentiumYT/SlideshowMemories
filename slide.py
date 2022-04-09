@@ -4,10 +4,12 @@ from PIL import Image, ImageTk
 from datetime import datetime
 
 class SlideShow(tk.Tk):
-    def __init__(self):
+    def __init__(self, directory: str = "."):
         """
         Main slideshow window without controls and max screen size
         """
+        self.directory = directory.replace("/", os.sep).replace("\\", os.sep)
+
         tk.Tk.__init__(self)
 
         self.attributes("-fullscreen", True)
@@ -24,13 +26,13 @@ class SlideShow(tk.Tk):
         self.canvas = tk.Canvas(self, background="black", highlightthickness=0)
         self.canvas.pack(fill="both", expand=True)
 
-        self.get_images(directory=directory)
+        self.get_images()
 
-    def get_images(self, directory="."):
+    def get_images(self):
         """
-        Get image directory from command line or use current directory
+        Get all images from the directory and shuffle them
         """
-        for root, _, files in os.walk(directory):
+        for root, _, files in os.walk(self.directory):
             for file in files:
                 if any(file.lower().endswith(x) for x in [".jpg", ".jpeg", ".png", ".gif"]):
                     img_path = os.path.join(root, file)
@@ -38,18 +40,19 @@ class SlideShow(tk.Tk):
 
         random.shuffle(self.image_list)
 
-    def start_slideshow(self, delay=4):
+    def start_slideshow(self, delay: int = 4):
         """
         Select an image from the list and display it with a delay
         """
         image = self.image_list[self.current_id]
+        # Select next image using its shuffle id (non repeatable until looping is complete)
         self.current_id = (self.current_id + 1) % len(self.image_list)
         self.show_image(image)
         self.after(delay * 1000, self.start_slideshow)
 
-    def parse_image(self, image_path):
+    def parse_image_date(self, image_path: str):
         """
-        Parse common dates (YMD format) or retrieve exif data
+        Parse common dates (YMD format) or use the file modification date
         * Full 20210215_112455 or 20210101-114941-87
         """
         image = image_path.split(os.sep)[-1]
@@ -63,16 +66,16 @@ class SlideShow(tk.Tk):
 
         return date.strftime("%d/%m/%Y %H:%M:%S")
 
-    def show_image(self, file):
+    def show_image(self, filepath: str):
         """
         Resize the image to fit the screen without exceeding the original image size / specified size
         """
-        image = Image.open(file)
+        image = Image.open(filepath)
 
-        filename = file.split(os.sep)[-1]
-        filedate = self.parse_image(file)
+        filename = filepath.split(os.sep)[-1]
+        filedate = self.parse_image_date(filepath)
 
-        image.thumbnail((self.screen_w, self.screen_h), Image.ANTIALIAS)
+        image.thumbnail((self.screen_w, self.screen_h), Image.Resampling.LANCZOS)
 
         self.current_image = ImageTk.PhotoImage(image)
         self.canvas.delete("all")
@@ -85,9 +88,6 @@ class SlideShow(tk.Tk):
 
 
 if __name__ == "__main__":
-    # Select current directory
-    directory = "."
-
-    slideShow = SlideShow()
-    slideShow.start_slideshow()
+    slideShow = SlideShow(directory=".")
+    slideShow.start_slideshow(delay=2)
     slideShow.mainloop()
