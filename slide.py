@@ -1,6 +1,6 @@
 import os, random
 import tkinter as tk
-from PIL import Image, ImageTk
+from PIL import Image, ImageTk, ExifTags
 from datetime import datetime
 
 class SlideShow(tk.Tk):
@@ -50,17 +50,24 @@ class SlideShow(tk.Tk):
         self.show_image(image)
         self.after(delay * 1000, self.start_slideshow)
 
-    def parse_image_date(self, image_path: str):
+    def parse_image_data(self, image_obj: Image) -> dict:
         """
-        Parse common dates (YMD format) or use the file modification date
-        * Full 20210215_112455 or 20210101-114941-87
+        Get image data from exif
         """
-        image = image_path.split(os.sep)[-1]
-        raw_date = image.split(".")[0]
+        exif = image_obj._getexif()
 
-        if len(image.split("-")) >= 2 or len(image.split("_")) >= 2:
-            parsed_date = "_".join(raw_date.split("-")[:2])
-            date = datetime.strptime(parsed_date, "%Y%m%d_%H%M%S")
+        if not exif:
+            return {}
+
+        return {ExifTags.TAGS[k]: v for k, v in exif.items() if k in ExifTags.TAGS}
+
+    def get_image_date(self, image_path: str, image_date: str) -> str:
+        """
+        Parse date using exif data if exists, else use file modification date
+        """
+
+        if image_date:
+            date = datetime.strptime(image_date, "%Y:%m:%d %H:%M:%S")
         else:
             date = datetime.fromtimestamp(os.stat(image_path).st_mtime)
 
@@ -73,7 +80,8 @@ class SlideShow(tk.Tk):
         image = Image.open(filepath)
 
         filename = filepath.split(os.sep)[-1]
-        filedate = self.parse_image_date(filepath)
+        filedata = self.parse_image_data(image)
+        filedate = self.get_image_date(filepath, filedata.get("DateTimeOriginal", filedata.get("DateTime")))
 
         image.thumbnail((self.screen_w, self.screen_h), Image.Resampling.LANCZOS)
 
