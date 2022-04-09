@@ -96,6 +96,6 @@ class SlideShow(tk.Tk):
 
 
 if __name__ == "__main__":
-    slideShow = SlideShow(directory=".")
+    slideShow = SlideShow(directory="img/")
     slideShow.start_slideshow(delay=2)
     slideShow.mainloop()
