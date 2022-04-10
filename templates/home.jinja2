@@ -1,0 +1,22 @@
+{% extends "base.jinja2" %}
+
+{% block title %}Slideshow - Configs{% endblock %}
+
+{% block body %}
+
+<main>
+    <h2>Informations</h2>
+
+    <p>Il y a actuellement <b>9999</b> photos disponibles</p>
+
+    <h2>Configurations</h2>
+
+    <form action="" method="POST">
+        <label for="delay">Délai entre les photos</label>
+        <br>
+        <input type="number" name="delay" value="10" min="1" max="120">
+        <button>Valider</button>
+    </form>
+</main>
+
+{% endblock %}
