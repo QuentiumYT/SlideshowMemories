@@ -8,15 +8,20 @@
     <h2>Informations</h2>
 
     <p>Il y a actuellement <b>{{ configs.image_count }}</b> photos disponibles dans le dossier <b>{{ directory }}</b></p>
+    {% if configs.current_image %}
     <p>Image actuellement affichée: </p>
     <p>{{ configs.current_image }}</p>
+    <img src="{{ url_for('download_file', filename=configs.current_image) }}" alt="Image actuelle">
+    <br>
+    <a class="dl-button" href="{{ url_for('download_file', filename=configs.current_image, download=True) }}">Télécharger l'image</a>
+    {% endif %}
 
     <h2>Configurations</h2>
 
-    <form action="" method="POST">
+    <form method="POST">
         <label for="delay">Délai entre les photos</label>
         <br>
-        <input type="number" name="delay" value="{{ configs.delay }}" min="1" max="120">
+        <input type="number" name="delay" value="{{ configs.delay | default(10) }}" min="1" max="120">
         <button>Valider</button>
     </form>
 

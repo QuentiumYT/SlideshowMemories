@@ -1,5 +1,5 @@
 import os, dotenv, glob
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory
 from flask_assets import Bundle, Environment
 
 class WebApp:
@@ -50,6 +50,12 @@ class WebApp:
         def not_found(error):
             self.session["error"] = str(error)
             return redirect(url_for("home"))
+
+        @self.app.route("/download/<path:filename>")
+        def download_file(filename, download: bool = False):
+            if request.args.get("download"):
+                download = True
+            return send_from_directory("pictures/", filename, as_attachment=download)
 
         @self.app.route("/", methods=["GET", "POST"])
         @self.app.route("/home", methods=["GET", "POST"])
