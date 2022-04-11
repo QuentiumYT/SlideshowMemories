@@ -40,15 +40,25 @@ class SlideShow(tk.Tk):
 
         random.shuffle(self.image_list)
 
-    def start_slideshow(self, delay: int = 4):
+    def start_slideshow(self):
         """
         Select an image from the list and display it with a delay
         """
+        # Default delay between images if not set
+        if not hasattr(self, "delay"):
+            self.delay = 2
+
         image = self.image_list[self.current_id]
         # Select next image using its shuffle id (non repeatable until looping is complete)
         self.current_id = (self.current_id + 1) % len(self.image_list)
         self.show_image(image)
-        self.after(delay * 1000, self.start_slideshow)
+        self.after(self.delay * 1000, self.start_slideshow)
+
+    def set_delay(self, delay: int):
+        """
+        Set the delay between images
+        """
+        self.delay = delay
 
     def parse_image_data(self, image_obj: Image) -> dict:
         """
@@ -107,10 +117,10 @@ class SlideShow(tk.Tk):
         """
         Resize the image to fit the screen without exceeding the original image size / specified size
         """
-        image = Image.open(filepath)
+        self.current_image = Image.open(filepath)
 
         filename = filepath.split(os.sep)[-1]
-        image_data = self.parse_image_data(image)
+        image_data = self.parse_image_data(self.current_image)
         image_date = self.get_image_date(filepath, image_data.get("DateTimeOriginal", image_data.get("DateTime")))
         if image_data.get("GPSInfo"):
             image_coords = self.get_image_coords(image_data.get("GPSInfo"))
@@ -121,11 +131,11 @@ class SlideShow(tk.Tk):
             image_alt = None
             image_loc = "Lieu non défini"
 
-        image.thumbnail((self.screen_w, self.screen_h), Image.Resampling.LANCZOS)
+        self.current_image.thumbnail((self.screen_w, self.screen_h), Image.Resampling.LANCZOS)
 
-        self.current_image = ImageTk.PhotoImage(image)
+        self.photo_image = ImageTk.PhotoImage(self.current_image)
         self.canvas.delete("all")
-        self.canvas.create_image(self.screen_w / 2, self.screen_h / 2, anchor="center", image=self.current_image)
+        self.canvas.create_image(self.screen_w / 2, self.screen_h / 2, anchor="center", image=self.photo_image)
 
         # Image date top left
         self.canvas.create_text(20, 10, text=image_date, fill="white", font=("Ubuntu", 12), anchor="nw")
@@ -140,6 +150,7 @@ class SlideShow(tk.Tk):
 if __name__ == "__main__":
     dotenv.load_dotenv()
 
-    slideShow = SlideShow(directory="img/")
-    slideShow.start_slideshow(delay=2)
-    slideShow.mainloop()
+    slideshow = SlideShow(directory="pictures/")
+    slideshow.start_slideshow()
+    slideshow.set_delay(2)
+    slideshow.mainloop()

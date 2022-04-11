@@ -7,16 +7,22 @@
 <main>
     <h2>Informations</h2>
 
-    <p>Il y a actuellement <b>9999</b> photos disponibles</p>
+    <p>Il y a actuellement <b>{{ configs.image_count }}</b> photos disponibles dans le dossier <b>{{ directory }}</b></p>
+    <p>Image actuellement affichée: </p>
+    <p>{{ configs.current_image }}</p>
 
     <h2>Configurations</h2>
 
     <form action="" method="POST">
         <label for="delay">Délai entre les photos</label>
         <br>
-        <input type="number" name="delay" value="10" min="1" max="120">
+        <input type="number" name="delay" value="{{ configs.delay }}" min="1" max="120">
         <button>Valider</button>
     </form>
+
+    {% if not configs %}
+    <h3>Les données n'ont pas encore chargées ou le diaporama n'a pas été lancé avec l'application web.</h3>
+    {% endif %}
 </main>
 
 {% endblock %}
