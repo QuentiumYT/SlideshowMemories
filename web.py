@@ -7,12 +7,16 @@ class WebApp:
         self.host = host
         self.port = port
         self.debug = debug
+        self.configs = {}
 
         self.watch_folder = lambda f: [x for x in glob.iglob(f + "**", recursive=True)]
 
     def init(self):
         self.app = Flask(__name__)
         self.app.config["SECRET_KEY"] = os.environ.get("FLASK_SECRET")
+        self.app.secret_key = os.environ.get("FLASK_SECRET")
+
+        self.session = session
 
         bundles = {
             "scss": Bundle(
@@ -44,16 +48,19 @@ class WebApp:
     def load_routes(self):
         @self.app.errorhandler(404)
         def not_found(error):
-            session["error"] = str(error)
+            self.session["error"] = str(error)
             return redirect(url_for("home"))
 
         @self.app.route("/", methods=["GET", "POST"])
         @self.app.route("/home", methods=["GET", "POST"])
         def home():
             if request.method == "POST":
-                print(request.form.get("delay"))
+                self.configs["delay"] = int(request.form.get("delay"))
 
-            return render_template("home.jinja2")
+                return redirect(url_for("home"))
+
+            return render_template("home.jinja2",
+                                   configs=self.configs)
 
     def run(self):
         self.app.run(host=self.host,
@@ -61,6 +68,8 @@ class WebApp:
                      debug=self.debug,
                      # Reload if SCSS was compiled
                      extra_files=self.watch_folder("scss/") + self.watch_folder("js/"))
+
+
 
 if __name__ == "__main__":
     dotenv.load_dotenv()
