@@ -44,8 +44,23 @@ header img {
 header h1 {
   margin-left: 2rem; }
 
-main h2 {
-  color: #5a5a5a;
-  font-size: 2.5em;
-  font-weight: 300;
-  margin: 0 0 20px; }
+main {
+  max-width: 960px;
+  margin: 0 auto; }
+  main h2 {
+    color: #5a5a5a;
+    font-size: 2.5em;
+    font-weight: 300;
+    margin: 20px 14px; }
+  main img {
+    display: block;
+    width: 400px;
+    height: auto;
+    max-width: 100vw; }
+  main .dl-button {
+    text-align: center;
+    background-color: #1b991b;
+    color: #eeeeee;
+    padding: 10px;
+    border-radius: 4px;
+    font-size: 1.2em; }

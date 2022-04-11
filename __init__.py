@@ -1,4 +1,4 @@
-import threading, time
+import threading, os, time
 
 from slide import SlideShow
 from web import WebApp
@@ -27,7 +27,7 @@ class Services:
         self.configs = {
             "directory": self.slideshow.directory,
             "image_count": len(self.slideshow.image_list),
-            "current_image": self.slideshow.current_image.filename,
+            "current_image": self.slideshow.current_image.filename.split(os.sep)[-1],
             "delay": self.slideshow.delay,
         }
         self.webapp.configs = self.configs.copy()
@@ -35,7 +35,7 @@ class Services:
         services.sync_configs(fetch_delay=2000)
 
     def sync_configs(self, fetch_delay: int = 2000):
-        self.configs["current_image"] = self.slideshow.current_image.filename
+        self.webapp.configs["current_image"] = self.slideshow.current_image.filename.split(os.sep)[-1]
         if self.configs["delay"] != self.webapp.configs["delay"]:
             self.slideshow.set_delay(self.webapp.configs["delay"])
             self.configs["delay"] = self.webapp.configs["delay"]
