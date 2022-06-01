@@ -1,4 +1,4 @@
-import os, dotenv, requests, random
+import os, dotenv, requests, random, hashlib
 import tkinter as tk
 from PIL import Image, ImageTk, ExifTags
 from datetime import datetime
@@ -148,8 +148,7 @@ class SlideShow(tk.Tk):
             image_coords = self.get_image_coords(image_data.get("GPSInfo"))
             image_alt = "Altitude : " + str(image_coords[2]) + "m"
 
-            # TODO: Create a hash function using the image data
-            image_hash = filepath
+            image_hash = hashlib.sha256(self.current_image.tobytes()).hexdigest()
             image_query = self.db.get_row("locations", "picture_hash", image_hash)
 
             if image_query:
