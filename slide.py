@@ -3,6 +3,8 @@ import tkinter as tk
 from PIL import Image, ImageTk, ExifTags
 from datetime import datetime
 
+from db import DB
+
 class SlideShow(tk.Tk):
     def __init__(self, directory: str = "."):
         """
@@ -27,6 +29,20 @@ class SlideShow(tk.Tk):
         self.canvas.pack(fill="both", expand=True)
 
         self.get_images()
+
+    def init_db(self, db_name: str):
+        self.db_name = db_name
+
+        self.db = DB(self.db_name)
+
+        struct = {
+            "id": "INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL",
+            "picture_name": "TEXT NOT NULL",
+            "picture_hash": "TEXT UNIQUE NOT NULL",
+            "location": "TEXT",
+        }
+
+        self.db.create_table("locations", struct)
 
     def get_images(self):
         """
@@ -111,7 +127,12 @@ class SlideShow(tk.Tk):
         url = f"http://api.positionstack.com/v1/reverse?access_key={key}&query={lat},{lon}&limit=1"
         req = requests.get(url)
 
-        return req.json()["data"][0]["name"] + ", " + req.json()["data"][0]["locality"]
+        if not req.ok:
+            return ""
+
+        location = req.json()["data"][0]["name"] + ", " + req.json()["data"][0]["locality"]
+
+        return location
 
     def show_image(self, filepath: str):
         """
@@ -119,13 +140,30 @@ class SlideShow(tk.Tk):
         """
         self.current_image = Image.open(filepath)
 
-        filename = filepath.split(os.sep)[-1]
+        image_name = filepath.split(os.sep)[-1]
         image_data = self.parse_image_data(self.current_image)
         image_date = self.get_image_date(filepath, image_data.get("DateTimeOriginal", image_data.get("DateTime")))
+
         if image_data.get("GPSInfo"):
             image_coords = self.get_image_coords(image_data.get("GPSInfo"))
             image_alt = "Altitude : " + str(image_coords[2]) + "m"
-            image_loc = self.get_image_location(image_coords[0], image_coords[1])
+
+            # TODO: Create a hash function using the image data
+            image_hash = filepath
+            image_query = self.db.get_row("locations", "picture_hash", image_hash)
+
+            if image_query:
+                image_loc = image_query["location"]
+            else:
+                image_loc = self.get_image_location(image_coords[0], image_coords[1])
+
+                data = {
+                    "picture_name": image_name,
+                    "picture_hash": image_hash,
+                    "location": image_loc,
+                }
+
+                self.db.insert_row("locations", data)
         else:
             image_coords = (0, 0, 0)
             image_alt = None
@@ -143,7 +181,7 @@ class SlideShow(tk.Tk):
         self.canvas.create_text(20, self.screen_h - (30 if image_alt else 10), text=image_loc, fill="white", font=("Ubuntu", 12), anchor="sw")
         self.canvas.create_text(20, self.screen_h - 10, text=image_alt, fill="white", font=("Ubuntu", 12), anchor="sw")
         # Image name bottom right
-        self.canvas.create_text(self.screen_w - 20, self.screen_h - 10, text=filename, fill="white", font=("Ubuntu", 12), anchor="se")
+        self.canvas.create_text(self.screen_w - 20, self.screen_h - 10, text=image_name, fill="white", font=("Ubuntu", 12), anchor="se")
 
 
 
@@ -151,6 +189,7 @@ if __name__ == "__main__":
     dotenv.load_dotenv()
 
     slideshow = SlideShow(directory="pictures/")
+    slideshow.init_db("data/slideshow.sqlite")
     slideshow.start_slideshow()
     slideshow.set_delay(2)
     slideshow.mainloop()
