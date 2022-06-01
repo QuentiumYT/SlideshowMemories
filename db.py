@@ -34,11 +34,11 @@ class DB:
         columns = [c for c in data.keys()]
         values = [v for v in data.values()]
 
-        if self.cursor.execute(f"SELECT * FROM {table_name} WHERE " + " OR ".join([f"{c}='{v}'" for c, v in zip(columns, values)])).fetchone():
-            print(f"Row already exists in table '{table_name}'")
-            return False
-
-        self.cursor.execute(f"INSERT INTO {table_name} ({', '.join(columns)}) VALUES ({', '.join(['?'] * len(values))})", values)
+        try:
+            self.cursor.execute(f"INSERT INTO {table_name} ({', '.join(columns)}) VALUES ({', '.join(['?'] * len(values))})", values)
+        except sqlite3.IntegrityError as e:
+            print(f"Error: {e}")
+            return None
 
         self.conn.commit()
 
@@ -60,7 +60,7 @@ if __name__ == "__main__":
 
     struct = {
         "id": "INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL",
-        "picture": "TEXT NOT NULL",
+        "picture": "TEXT UNIQUE NOT NULL",
         "place": "TEXT",
     }
 
@@ -75,4 +75,5 @@ if __name__ == "__main__":
 
     result = db.get_row("locations", "picture", "eiffel_tower.jpg")
 
-    print(result["picture"])
+    if result:
+        print(result.get("picture"))
