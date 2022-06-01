@@ -103,10 +103,14 @@ venv.bak/
 # mypy
 .mypy_cache/
 
-# Data and personnal files
-data/config.json
-data/data.json
-data/triggers.json
+# Data files
+data/slideshow.sqlite
+data/!data.sqlite
 
-+extra/
-pictures/
+# Pictures
+pictures/*
+!pictures/mountains.jpg
+
+# Static compiled files
+static/js/*
+static/css/*
