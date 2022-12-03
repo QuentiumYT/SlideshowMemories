@@ -95,7 +95,7 @@ class SlideShow(tk.Tk):
 
         return date.strftime("%d/%m/%Y %H:%M:%S")
 
-    def get_image_coords(self, gps_info: dict) -> str:
+    def get_image_coords(self, gps_info: dict) -> tuple:
         """
         Get the image coordinates as latitude, longitude and altitude
         """
@@ -139,14 +139,14 @@ class SlideShow(tk.Tk):
 
         if image_data.get("GPSInfo"):
             image_coords = self.get_image_coords(image_data.get("GPSInfo"))
-            image_alt = "Altitude : " + str(image_coords[2]) + "m"
+            image_alt = f"Altitude : {image_coords[2]}m"
 
             image_hash = hashlib.sha256(self.current_image.tobytes()).hexdigest()
             image_query = self.db.get_row("locations", "picture_hash", image_hash)
 
             if image_query:
                 image_loc = image_query["location"]
-            else:
+            elif os.environ.get("API_KEY"):
                 image_loc = self.get_image_location(image_coords[0], image_coords[1])
 
                 data = {
@@ -156,6 +156,8 @@ class SlideShow(tk.Tk):
                 }
 
                 self.db.insert_row("locations", data)
+            else:
+                image_loc = f"Lat : {image_coords[0]}, Lon : {image_coords[1]}"
         else:
             image_coords = (0, 0, 0)
             image_alt = None
