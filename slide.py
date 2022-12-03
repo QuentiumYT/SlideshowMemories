@@ -19,7 +19,7 @@ class SlideShow(tk.Tk):
         self.overrideredirect(True)
 
         self.screen_w, self.screen_h = self.winfo_screenwidth(), self.winfo_screenheight()
-        self.geometry("{}x{}+{}+{}".format(self.screen_w, self.screen_h, 0, 0))
+        self.geometry(f"{self.screen_w}x{self.screen_h}+0+0")
 
         self.image_list = []
         self.current_image = None
@@ -82,10 +82,7 @@ class SlideShow(tk.Tk):
         """
         exif = image_obj._getexif()
 
-        if not exif:
-            return {}
-
-        return {ExifTags.TAGS[k]: v for k, v in exif.items() if k in ExifTags.TAGS}
+        return {ExifTags.TAGS[k]: v for k, v in exif.items() if k in ExifTags.TAGS} if exif else {}
 
     def get_image_date(self, image_path: str, image_date: str) -> str:
         """
@@ -102,12 +99,13 @@ class SlideShow(tk.Tk):
         """
         Get the image coordinates as latitude, longitude and altitude
         """
-        # Convert the GPS coordinates stored in the EXIF to degrees in float format
-        dms_to_decimal = lambda dms: float(dms[0]) + float(dms[1]) / 60 + float(dms[2]) / 3600
 
         coords_data = {ExifTags.GPSTAGS[k]: v for k, v in gps_info.items() if k in ExifTags.GPSTAGS}
 
         if coords_data:
+            # Convert the GPS coordinates stored in the EXIF to degrees in float format
+            dms_to_decimal = lambda dms: float(dms[0]) + float(dms[1]) / 60 + float(dms[2]) / 3600
+
             lat = + dms_to_decimal(coords_data.get("GPSLatitude"))
             lon = + dms_to_decimal(coords_data.get("GPSLongitude"))
             alt = round(coords_data.get("GPSAltitude"))
@@ -127,12 +125,7 @@ class SlideShow(tk.Tk):
         url = f"http://api.positionstack.com/v1/reverse?access_key={key}&query={lat},{lon}&limit=1"
         req = requests.get(url)
 
-        if not req.ok:
-            return ""
-
-        location = req.json()["data"][0]["name"] + ", " + req.json()["data"][0]["locality"]
-
-        return location
+        return req.json()["data"][0]["name"] + ", " + req.json()["data"][0]["locality"] if req.ok else ""
 
     def show_image(self, filepath: str):
         """
