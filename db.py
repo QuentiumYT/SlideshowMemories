@@ -1,10 +1,7 @@
 import sqlite3
 
 def dict_factory(cursor, row):
-    d = {}
-    for idx, col in enumerate(cursor.description):
-        d[col[0]] = row[idx]
-    return d
+    return {col[0]: row[idx] for idx, col in enumerate(cursor.description)}
 
 class DB:
     def __init__(self, db_path: str):
@@ -31,8 +28,8 @@ class DB:
         Insert a row into the table
         """
 
-        columns = [c for c in data.keys()]
-        values = [v for v in data.values()]
+        columns = list(data.keys())
+        values = list(data.values())
 
         try:
             self.cursor.execute(f"INSERT INTO {table_name} ({', '.join(columns)}) VALUES ({', '.join(['?'] * len(values))})", values)

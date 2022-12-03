@@ -9,7 +9,7 @@ class WebApp:
         self.debug = debug
         self.configs = {}
 
-        self.watch_folder = lambda f: [x for x in glob.iglob(f + "**", recursive=True)]
+        self.watch_folder = lambda f: list(glob.iglob(f + "**", recursive=True))
 
     def init(self):
         self.app = Flask(__name__)
