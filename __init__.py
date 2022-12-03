@@ -19,6 +19,7 @@ class Services:
 
     def start_slide(self):
         self.slideshow = SlideShow(directory="pictures/")
+        self.slideshow.init_db("data/slideshow.sqlite")
         self.slideshow.start_slideshow()
         self.slideshow.set_delay(3)
         self.slideshow.mainloop()
