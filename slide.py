@@ -19,12 +19,19 @@ class SlideShow(tk.Tk):
 
         tk.Tk.__init__(self)
 
-        self.attributes("-fullscreen", True)
+        self.title("Slideshow")
 
-        self.overrideredirect(True)
+        self.bind("<Escape>", lambda _: self.destroy())
+        self.bind("<Control-c>", lambda _: self.destroy())
+
+        self.attributes("-fullscreen", True)
 
         self.screen_w, self.screen_h = self.winfo_screenwidth(), self.winfo_screenheight()
         self.geometry(f"{self.screen_w}x{self.screen_h}+0+0")
+
+        self.resizable(False, False)
+
+        self.update_idletasks()
 
         self.image_list = []
         self.current_image = None
