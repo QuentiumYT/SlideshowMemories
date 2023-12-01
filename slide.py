@@ -1,7 +1,12 @@
-import os, dotenv, requests, random, hashlib
+import hashlib
+import os
+import random
 import tkinter as tk
-from PIL import Image, ImageTk, ExifTags
 from datetime import datetime
+
+import dotenv
+import requests
+from PIL import ExifTags, Image, ImageTk
 
 from db import DB
 
@@ -82,6 +87,7 @@ class SlideShow(tk.Tk):
         """
         Get image data from exif
         """
+        # pylint: disable=protected-access
         exif = image_obj._getexif()
 
         return {ExifTags.TAGS[k]: v for k, v in exif.items() if k in ExifTags.TAGS} if exif else {}
@@ -106,6 +112,7 @@ class SlideShow(tk.Tk):
 
         if coords_data:
             # Convert the GPS coordinates stored in the EXIF to degrees in float format
+            # pylint: disable=unnecessary-lambda-assignment
             dms_to_decimal = lambda dms: float(dms[0]) + float(dms[1]) / 60 + float(dms[2]) / 3600
 
             lat = + dms_to_decimal(coords_data.get("GPSLatitude"))
@@ -119,13 +126,13 @@ class SlideShow(tk.Tk):
 
         return lat, lon, alt
 
-    def get_image_location(self, lat, lon):
+    def get_image_location(self, lat: str, lon: str) -> str:
         """
         Get the place at which the image was taken using latitude and longitude
         """
         key = os.environ.get("API_KEY")
         url = f"http://api.positionstack.com/v1/reverse?access_key={key}&query={lat},{lon}&limit=1"
-        req = requests.get(url)
+        req = requests.get(url, timeout=5)
 
         return req.json()["data"][0]["name"] + ", " + req.json()["data"][0]["locality"] if req.ok else ""
 
@@ -139,7 +146,7 @@ class SlideShow(tk.Tk):
         image_data = self.parse_image_data(self.current_image)
         image_date = self.get_image_date(filepath, image_data.get("DateTimeOriginal", image_data.get("DateTime")))
 
-        if image_data.get("GPSInfo"):
+        if image_data.get("GPSInfo") and isinstance(image_data.get("GPSInfo"), dict):
             image_coords = self.get_image_coords(image_data.get("GPSInfo"))
             image_alt = f"Altitude : {image_coords[2]}m"
 

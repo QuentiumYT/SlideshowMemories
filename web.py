@@ -1,5 +1,16 @@
-import os, dotenv, glob
-from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory
+import glob
+import os
+
+import dotenv
+from flask import (
+    Flask,
+    redirect,
+    render_template,
+    request,
+    send_from_directory,
+    session,
+    url_for,
+)
 from flask_assets import Bundle, Environment
 
 class WebApp:

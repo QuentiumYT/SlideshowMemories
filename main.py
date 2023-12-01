@@ -1,4 +1,6 @@
-import threading, os, time
+import os
+import threading
+import time
 
 from slide import SlideShow
 from web import WebApp
@@ -33,7 +35,7 @@ class Services:
         }
         self.webapp.configs = self.configs.copy()
         # Run sync configs in a tkinter event loop
-        services.sync_configs(fetch_delay=2000)
+        self.sync_configs(fetch_delay=2000)
 
     def sync_configs(self, fetch_delay: int = 2000):
         self.webapp.configs["current_image"] = self.slideshow.current_image.filename.split(os.sep)[-1]

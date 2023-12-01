@@ -10,20 +10,23 @@ class DB:
         self.conn.row_factory = dict_factory
         self.cursor = self.conn.cursor()
 
-    def create_table(self, table_name: str, columns: dict):
+    def create_table(self, table_name: str, columns: dict) -> bool:
         """
         Create a table with the given name and columns
         """
 
         if self.cursor.execute(f"SELECT name FROM sqlite_master WHERE type='table' AND name='{table_name}'").fetchone():
             print(f"Table '{table_name}' already exists, skipping...")
+
             return False
 
         columns = [f"{k} {v}" for k, v in columns.items()]
 
         self.cursor.execute(f"CREATE TABLE {table_name} ({', '.join(columns)})")
 
-    def insert_row(self, table_name: str, data: dict):
+        return True
+
+    def insert_row(self, table_name: str, data: dict) -> int | None:
         """
         Insert a row into the table
         """
@@ -41,7 +44,7 @@ class DB:
 
         return self.cursor.lastrowid
 
-    def get_row(self, table_name: str, column: str, value: str):
+    def get_row(self, table_name: str, column: str, value: str) -> dict | None:
         """
         Get a row from the table
         """
