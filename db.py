@@ -57,20 +57,26 @@ if __name__ == "__main__":
 
     struct = {
         "id": "INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL",
-        "picture": "TEXT UNIQUE NOT NULL",
-        "place": "TEXT",
+        "name": "TEXT NOT NULL",
+        "hash": "TEXT UNIQUE NOT NULL",
+        "lat": "REAL NOT NULL",
+        "lon": "REAL NOT NULL",
+        "location": "TEXT",
     }
 
     db.create_table("locations", struct)
 
-    data = {
-        "picture": "eiffel_tower.jpg",
-        "place": "Paris",
+    exemple_data = {
+        "name": "eiffel_tower.jpg",
+        "hash": "1234567890",
+        "lat": "48.8584",
+        "lon": "2.2945",
+        "location": "Paris, France",
     }
 
-    db.insert_row("locations", data)
+    db.insert_row("locations", exemple_data)
 
-    result = db.get_row("locations", "picture", "eiffel_tower.jpg")
+    result = db.get_row("locations", "name", "eiffel_tower.jpg")
 
     if result:
-        print(result.get("picture"))
+        print(result.get("location"))

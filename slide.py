@@ -37,8 +37,10 @@ class SlideShow(tk.Tk):
 
         struct = {
             "id": "INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL",
-            "picture_name": "TEXT NOT NULL",
-            "picture_hash": "TEXT UNIQUE NOT NULL",
+            "name": "TEXT NOT NULL",
+            "hash": "TEXT UNIQUE NOT NULL",
+            "lat": "REAL NOT NULL",
+            "lon": "REAL NOT NULL",
             "location": "TEXT",
         }
 
@@ -142,20 +144,25 @@ class SlideShow(tk.Tk):
             image_alt = f"Altitude : {image_coords[2]}m"
 
             image_hash = hashlib.sha256(self.current_image.tobytes()).hexdigest()
-            image_query = self.db.get_row("locations", "picture_hash", image_hash)
+            image_query = self.db.get_row("locations", "hash", image_hash)
 
             if image_query:
-                image_loc = image_query["location"]
+                image_loc = image_query.get("location")
             elif os.environ.get("API_KEY"):
                 image_loc = self.get_image_location(image_coords[0], image_coords[1])
 
-                data = {
-                    "picture_name": image_name,
-                    "picture_hash": image_hash,
-                    "location": image_loc,
-                }
+                if image_loc:
+                    data = {
+                        "name": image_name,
+                        "hash": image_hash,
+                        "lat": image_coords[0],
+                        "lon": image_coords[1],
+                        "location": image_loc,
+                    }
 
-                self.db.insert_row("locations", data)
+                    self.db.insert_row("locations", data)
+                else:
+                    image_loc = f"Lat : {image_coords[0]}, Lon : {image_coords[1]}"
             else:
                 image_loc = f"Lat : {image_coords[0]}, Lon : {image_coords[1]}"
         else:
