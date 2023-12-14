@@ -7,13 +7,22 @@
 <main>
     <h2>Informations</h2>
 
-    <p>Il y a actuellement <b>{{ configs.image_count }}</b> photos disponibles dans le dossier <b>{{ directory }}</b></p>
     {% if configs.current_image %}
+
+    <p>Il y a actuellement <b>{{ configs.image_count }}</b> photos disponibles dans le dossier <b>{{ directory }}</b></p>
     <p>Image actuellement affichée: </p>
     <p>{{ configs.current_image }}</p>
-    <img src="{{ url_for('download_file', filename=configs.current_image) }}" alt="Image actuelle">
-    <br>
-    <a class="dl-button" href="{{ url_for('download_file', filename=configs.current_image, download=True) }}">Télécharger l'image</a>
+
+    <img class="current-image" src="{{ url_for('download_file', filename=configs.current_image) }}" alt="Image actuelle">
+
+    <a class="dl-button" href="{{ url_for('download_file', filename=configs.current_image, download=True) }}">
+        Télécharger l'image
+    </a>
+
+    {% else %}
+
+    <p class="error-message">Il n'y a actuellement aucune photo affichée, le programme est soit en veille, soit le diaporama n'a pas été lancé</p>
+
     {% endif %}
 
     <h2>Configurations</h2>
@@ -24,10 +33,6 @@
         <input type="number" name="delay" value="{{ configs.delay | default(10) }}" min="1" max="120">
         <button>Valider</button>
     </form>
-
-    {% if not configs %}
-    <h3>Les données n'ont pas encore chargées ou le diaporama n'a pas été lancé avec l'application web.</h3>
-    {% endif %}
 </main>
 
 {% endblock %}

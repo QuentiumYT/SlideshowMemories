@@ -6,3 +6,6 @@ requests~=2.31
 # Web
 flask~=3.0
 flask-assets~=2.1
+libsass~=0.22
+cssmin~=0.2
+jsmin~=3.0
