@@ -15,14 +15,14 @@ class Services:
     def start_web(self):
         # Debug is not possible in a thread, that's why it should always be false
         self.webapp = WebApp("0.0.0.0", 5502, False)
-        self.webapp.init()
+        self.webapp.init_web()
         self.webapp.load_routes()
         self.webapp.run()
 
     def start_slide(self):
         self.slideshow = SlideShow(directory="pictures/")
         self.slideshow.init_db("data/slideshow.sqlite")
-        self.slideshow.start_slideshow()
+        self.slideshow.display_slides()
         self.slideshow.set_delay(3)
         self.slideshow.mainloop()
 

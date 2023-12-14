@@ -22,7 +22,7 @@ class WebApp:
 
         self.watch_folder = lambda f: list(glob.iglob(f + "**", recursive=True))
 
-    def init(self):
+    def init_web(self):
         self.app = Flask(__name__)
         self.app.config["SECRET_KEY"] = os.environ.get("FLASK_SECRET")
         self.app.secret_key = os.environ.get("FLASK_SECRET")
@@ -92,6 +92,8 @@ if __name__ == "__main__":
     dotenv.load_dotenv()
 
     webapp = WebApp("0.0.0.0", 5502, True)
-    webapp.init()
+
+    webapp.init_web()
     webapp.load_routes()
+
     webapp.run()

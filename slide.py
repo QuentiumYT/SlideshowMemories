@@ -8,7 +8,7 @@ import dotenv
 import requests
 from PIL import ExifTags, Image, ImageTk
 
-from db import DB
+from db import DBHandler
 
 class SlideShow(tk.Tk):
     def __init__(self, directory: str = "."):
@@ -45,7 +45,7 @@ class SlideShow(tk.Tk):
     def init_db(self, db_name: str):
         self.db_name = db_name
 
-        self.db = DB(self.db_name)
+        self.db = DBHandler(self.db_name)
 
         struct = {
             "id": "INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL",
@@ -70,9 +70,9 @@ class SlideShow(tk.Tk):
 
         random.shuffle(self.image_list)
 
-    def start_slideshow(self):
+    def display_slides(self):
         """
-        Select an image from the list and display it with a delay
+        Select each image of the random list and display them with a delay
         """
         # Default delay between images if not set
         if not hasattr(self, "delay"):
@@ -82,7 +82,7 @@ class SlideShow(tk.Tk):
         # Select next image using its shuffle id (non repeatable until looping is complete)
         self.current_id = (self.current_id + 1) % len(self.image_list)
         self.show_image(image)
-        self.after(self.delay * 1000, self.start_slideshow)
+        self.after(self.delay * 1000, self.display_slides)
 
     def set_delay(self, delay: int):
         """
@@ -204,7 +204,9 @@ if __name__ == "__main__":
     dotenv.load_dotenv()
 
     slideshow = SlideShow(directory="pictures/")
+
     slideshow.init_db("data/slideshow.sqlite")
-    slideshow.start_slideshow()
+    slideshow.display_slides()
     slideshow.set_delay(2)
+
     slideshow.mainloop()

@@ -3,7 +3,7 @@ import sqlite3
 def dict_factory(cursor, row):
     return {col[0]: row[idx] for idx, col in enumerate(cursor.description)}
 
-class DB:
+class DBHandler:
     def __init__(self, db_path: str):
         self.db_path = db_path
         self.conn = sqlite3.connect(self.db_path)
@@ -16,7 +16,7 @@ class DB:
         """
 
         if self.cursor.execute(f"SELECT name FROM sqlite_master WHERE type='table' AND name='{table_name}'").fetchone():
-            print(f"Table '{table_name}' already exists, skipping...")
+            print(f"Info: Table '{table_name}' already exists, skipping...")
 
             return False
 
@@ -56,7 +56,7 @@ class DB:
 
 
 if __name__ == "__main__":
-    db = DB("data/data.sqlite")
+    db = DBHandler("data/data.sqlite")
 
     struct = {
         "id": "INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL",
@@ -82,4 +82,4 @@ if __name__ == "__main__":
     result = db.get_row("locations", "name", "eiffel_tower.jpg")
 
     if result:
-        print(result.get("location"))
+        print("Localisation :", result.get("location"))
