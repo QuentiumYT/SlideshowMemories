@@ -45,6 +45,17 @@ Copy the .env.example file to .env and fill it with your values.
 
 🚩 A config file is planned to be added soon.
 
+## 📷 Preview
+
+**Slideshow preview**
+![Slideshow preview](./screenshots/slideshow.png)
+
+**Website preview**
+![Website preview](./screenshots/website.png)
+
+**Database preview**
+![Database preview](./screenshots/database.png)
+
 ## 📚 Documentation
 
 Later :) You can check the code, it is documented.
