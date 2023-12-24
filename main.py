@@ -4,11 +4,13 @@ import time
 
 from slide import SlideShow
 from web import WebApp
+from device import DeviceManager
 
 class Services:
     def __init__(self):
         self.webapp = None
         self.slideshow = None
+        self.device_manager = None
 
         self.configs = {}
 
@@ -25,6 +27,14 @@ class Services:
         self.slideshow.display_slides()
         self.slideshow.set_delay(3)
         self.slideshow.mainloop()
+
+    def start_device(self):
+        if not DeviceManager:
+            return
+
+        self.device_manager = DeviceManager()
+        self.device_manager.get_mountpoints()
+        self.device_manager.watch()
 
     def load_configs(self):
         self.configs = {
@@ -54,6 +64,9 @@ if __name__ == "__main__":
 
     web_thread = threading.Thread(target=services.start_web)
     web_thread.start()
+
+    device_thread = threading.Thread(target=services.start_device)
+    device_thread.start()
 
     # Once the thread is initialized, load configs from the slideshow
     time.sleep(1)
