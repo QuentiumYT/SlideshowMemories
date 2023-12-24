@@ -11,12 +11,10 @@ from PIL import ExifTags, Image, ImageTk
 from db import DBHandler
 
 class SlideShow(tk.Tk):
-    def __init__(self, directory: str = "."):
+    def __init__(self):
         """
         Main slideshow window without controls and max screen size
         """
-        self.directory = directory.replace("/", os.sep).replace("\\", os.sep)
-
         tk.Tk.__init__(self)
 
         self.title("Slideshow")
@@ -33,6 +31,7 @@ class SlideShow(tk.Tk):
 
         self.update_idletasks()
 
+        self.directories = []
         self.image_list = []
         self.current_image = None
         self.current_id = 0
@@ -40,12 +39,10 @@ class SlideShow(tk.Tk):
         self.canvas = tk.Canvas(self, background="black", highlightthickness=0)
         self.canvas.pack(fill="both", expand=True)
 
-        self.get_images()
+    def init_db(self, db_path: str):
+        self.db_path = db_path
 
-    def init_db(self, db_name: str):
-        self.db_name = db_name
-
-        self.db = DBHandler(self.db_name)
+        self.db = DBHandler(self.db_path)
 
         struct = {
             "id": "INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL",
@@ -58,17 +55,23 @@ class SlideShow(tk.Tk):
 
         self.db.create_table("locations", struct)
 
-    def get_images(self):
+    def load_images(self, directory: str):
         """
-        Get all images from the directory and shuffle them
+        Load all images from the directory and shuffle them
         """
-        for root, _, files in os.walk(self.directory):
+        current_images_count = len(self.image_list)
+
+        for root, _, files in os.walk(directory):
             for file in files:
                 if any(file.lower().endswith(x) for x in [".jpg", ".jpeg", ".png", ".gif"]):
                     img_path = os.path.join(root, file)
-                    self.image_list.append(img_path)
+                    if img_path not in self.image_list:
+                        self.image_list.append(img_path)
 
-        random.shuffle(self.image_list)
+        # Append to directories list and shuffle only if new images were found
+        if len(self.image_list) > current_images_count:
+            self.directories.append(directory)
+            random.shuffle(self.image_list)
 
     def display_slides(self):
         """
@@ -203,9 +206,10 @@ class SlideShow(tk.Tk):
 if __name__ == "__main__":
     dotenv.load_dotenv()
 
-    slideshow = SlideShow(directory="pictures/")
+    slideshow = SlideShow()
 
     slideshow.init_db("data/slideshow.sqlite")
+    slideshow.load_images("pictures/")
     slideshow.display_slides()
     slideshow.set_delay(2)
 

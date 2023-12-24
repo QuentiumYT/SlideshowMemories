@@ -9,7 +9,9 @@
 
     {% if configs.current_image %}
 
-    <p>Il y a actuellement <b>{{ configs.image_count }}</b> photos disponibles dans le dossier <b>{{ directory }}</b></p>
+    <p>Il y a actuellement <b>{{ configs.image_count }}</b> {{ 'photos' if configs.image_count > 1 else 'photo' }} disponibles
+    dans {{ 'les dossiers' if configs.directories | length > 1 else 'le dossier' }} <b>{{ configs.directories | join(', ') }}</b></p>
+    
     <p>Image actuellement affichée: </p>
     <p>{{ configs.current_image }}</p>
 

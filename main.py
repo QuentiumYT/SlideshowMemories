@@ -22,8 +22,9 @@ class Services:
         self.webapp.run()
 
     def start_slide(self):
-        self.slideshow = SlideShow(directory="pictures/")
+        self.slideshow = SlideShow()
         self.slideshow.init_db("data/slideshow.sqlite")
+        self.slideshow.load_images(directory="pictures/")
         self.slideshow.display_slides()
         self.slideshow.set_delay(3)
         self.slideshow.mainloop()
@@ -38,7 +39,7 @@ class Services:
 
     def load_configs(self):
         self.configs = {
-            "directory": self.slideshow.directory,
+            "directories": self.slideshow.directories,
             "image_count": len(self.slideshow.image_list),
             "current_image": self.slideshow.current_image.filename.split(os.sep)[-1],
             "delay": self.slideshow.delay,
@@ -70,4 +71,9 @@ if __name__ == "__main__":
 
     # Once the thread is initialized, load configs from the slideshow
     time.sleep(1)
+    services.load_configs()
+
+    # Load extra images into the slideshow
+    time.sleep(5)
+    services.slideshow.load_images("screenshots/")
     services.load_configs()
