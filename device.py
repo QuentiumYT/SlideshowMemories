@@ -1,8 +1,14 @@
+import os
 import psutil
-import pyudev
-from pyudev import Device
 
-class DeviceManager:
+if os.name == "posix":
+    import pyudev
+    from pyudev import Device
+else:
+    pyudev = None
+    Device = None
+
+class DeviceManagerLinux:
     def __init__(self):
         self.devices = []
         self.partitions = []
@@ -73,7 +79,18 @@ class DeviceManager:
                             self.mountpoints.remove(mountpoint)
                             print("Partition démontée :", mountpoint)
 
+if os.name == "posix":
+    DeviceManager = DeviceManagerLinux
+else:
+    DeviceManager = None
+
+
+
 if __name__ == "__main__":
+    if not DeviceManager:
+        print("Error: DeviceManager is not available on this platform.")
+        raise SystemExit
+
     device_manager = DeviceManager()
 
     devices = device_manager.get_devices()
