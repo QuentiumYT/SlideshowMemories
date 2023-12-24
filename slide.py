@@ -11,7 +11,7 @@ from PIL import ExifTags, Image, ImageTk
 from db import DBHandler
 
 class SlideShow(tk.Tk):
-    def __init__(self):
+    def __init__(self, fullscreen: bool = True):
         """
         Main slideshow window without controls and max screen size
         """
@@ -19,15 +19,21 @@ class SlideShow(tk.Tk):
 
         self.title("Slideshow")
 
+        self.iconphoto(True, tk.PhotoImage(file="static/img/logo.png"))
+
         self.bind("<Escape>", lambda _: self.destroy())
         self.bind("<Control-c>", lambda _: self.destroy())
 
-        self.attributes("-fullscreen", True)
+        if fullscreen:
+            self.attributes("-fullscreen", True)
 
-        self.screen_w, self.screen_h = self.winfo_screenwidth(), self.winfo_screenheight()
-        self.geometry(f"{self.screen_w}x{self.screen_h}+0+0")
+            self.screen_w, self.screen_h = self.winfo_screenwidth(), self.winfo_screenheight()
+            self.geometry(f"{self.screen_w}x{self.screen_h}+0+0")
 
-        self.resizable(False, False)
+            self.resizable(False, False)
+        else:
+            self.screen_w, self.screen_h = 1280, 720
+            self.geometry(f"{self.screen_w}x{self.screen_h}+0+0")
 
         self.update_idletasks()
 
@@ -206,7 +212,7 @@ class SlideShow(tk.Tk):
 if __name__ == "__main__":
     dotenv.load_dotenv()
 
-    slideshow = SlideShow()
+    slideshow = SlideShow(fullscreen=False)
 
     slideshow.init_db("data/slideshow.sqlite")
     slideshow.load_images("pictures/")
