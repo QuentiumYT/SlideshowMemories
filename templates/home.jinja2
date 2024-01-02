@@ -15,9 +15,9 @@
     <p>Image actuellement affichée: </p>
     <p>{{ configs.current_image }}</p>
 
-    <img class="current-image" src="{{ url_for('download_file', filename=configs.current_image) }}" alt="Image actuelle">
+    <img class="current-image" src="{{ url_for('preview_image', filename=configs.current_image) }}" alt="Image actuelle">
 
-    <a class="dl-button" href="{{ url_for('download_file', filename=configs.current_image, download=True) }}">
+    <a class="dl-button" href="{{ url_for('preview_image', filename=configs.current_image, download=True) }}">
         Télécharger l'image
     </a>
 

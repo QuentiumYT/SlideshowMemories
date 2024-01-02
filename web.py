@@ -22,6 +22,8 @@ class WebApp:
 
         self.watch_folder = lambda f: list(glob.iglob(f + "**", recursive=True))
 
+        dotenv.load_dotenv()
+
     def init_web(self):
         self.app = Flask(__name__)
         self.app.config["SECRET_KEY"] = os.environ.get("FLASK_SECRET")
@@ -62,8 +64,8 @@ class WebApp:
             self.session["error"] = str(error)
             return redirect(url_for("home"))
 
-        @self.app.route("/download/<path:filename>", strict_slashes=False)
-        def download_file(filename, download: bool = False):
+        @self.app.route("/preview/<path:filename>", strict_slashes=False)
+        def preview_image(filename, download: bool = False):
             if request.args.get("download"):
                 download = True
             directory = os.sep.join(filename.split(os.sep)[:-1])
@@ -90,8 +92,6 @@ class WebApp:
 
 
 if __name__ == "__main__":
-    dotenv.load_dotenv()
-
     webapp = WebApp("0.0.0.0", 5502, True)
 
     webapp.init_web()
