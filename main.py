@@ -61,12 +61,15 @@ class Services:
 if __name__ == "__main__":
     services = Services()
     slide_thread = threading.Thread(target=services.start_slide)
+    slide_thread.daemon = True
     slide_thread.start()
 
     web_thread = threading.Thread(target=services.start_web)
+    web_thread.daemon = True
     web_thread.start()
 
     device_thread = threading.Thread(target=services.start_device)
+    device_thread.daemon = True
     device_thread.start()
 
     # Once the thread is initialized, load configs from the slideshow
