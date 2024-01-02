@@ -64,11 +64,11 @@ class WebApp:
             self.session["error"] = str(error)
             return redirect(url_for("home"))
 
-        @self.app.route("/preview/<path:filename>", strict_slashes=False)
-        def preview_image(filename, download: bool = False):
+        @self.app.route("/preview/<path:filepath>", strict_slashes=False)
+        def preview_image(filepath, download: bool = False):
             if request.args.get("download"):
                 download = True
-            directory = os.sep.join(filename.split(os.sep)[:-1])
+            directory, filename = os.path.split(filepath)
             return send_from_directory(directory, filename, as_attachment=download)
 
         @self.app.route("/", methods=["GET", "POST"])

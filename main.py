@@ -41,7 +41,7 @@ class Services:
         self.configs = {
             "directories": self.slideshow.directories,
             "image_count": len(self.slideshow.image_list),
-            "current_image": self.slideshow.current_image.filename.split(os.sep)[-1],
+            "current_image": self.slideshow.current_image.filename,
             "delay": self.slideshow.delay,
         }
         self.webapp.configs = self.configs.copy()
@@ -49,7 +49,7 @@ class Services:
         self.sync_configs(fetch_delay=2000)
 
     def sync_configs(self, fetch_delay: int = 2000):
-        self.webapp.configs["current_image"] = self.slideshow.current_image.filename.split(os.sep)[-1]
+        self.webapp.configs["current_image"] = self.slideshow.current_image.filename
         if self.configs["delay"] != self.webapp.configs["delay"]:
             self.slideshow.set_delay(self.webapp.configs["delay"])
             self.configs["delay"] = self.webapp.configs["delay"]
