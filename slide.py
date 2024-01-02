@@ -15,7 +15,7 @@ class SlideShow(tk.Tk):
         """
         Main slideshow window without controls and max screen size
         """
-        tk.Tk.__init__(self)
+        tk.Tk.__init__(self, className="Slideshow")
 
         self.title("Slideshow")
 
